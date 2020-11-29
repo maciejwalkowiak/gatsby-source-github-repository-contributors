@@ -1,14 +1,38 @@
-/**
- * Implement Gatsby's Node APIs in this file.
- *
- * See: https://www.gatsbyjs.com/docs/node-apis/
- */
-// You can delete this file if you're not using it
+const fetch = require("node-fetch");
 
-/**
- * You can uncomment the following line to verify that
- * your plugin is being loaded in your site.
- *
- * See: https://www.gatsbyjs.com/docs/creating-a-local-plugin/#developing-a-local-plugin-that-is-outside-your-project
- */
-exports.onPreInit = () => console.log("Loaded gatsby-starter-plugin")
+const POST_NODE_TYPE = `Contributors`
+exports.sourceNodes = async ({
+                                 actions,
+                                 createContentDigest,
+                                 createNodeId,
+                                 getNodesByType,
+                             }, pluginOptions) => {
+    const {createNode} = actions
+
+    const contributors = []
+    let hasMore = true;
+    let page = 1;
+    do {
+        const response = await fetch(`https://api.github.com/repos/${pluginOptions.org}/${pluginOptions.repository}/contributors?page=${page++}`)
+        const result = await response.json()
+        contributors.push(...result)
+        hasMore = result.length > 0
+    } while (hasMore);
+
+    console.log(`Loaded ${contributors.length} contributors`);
+
+    contributors.forEach(post =>
+        createNode({
+            ...post,
+            id: createNodeId(`${POST_NODE_TYPE}-${post.id}`),
+            parent: null,
+            children: [],
+            internal: {
+                type: POST_NODE_TYPE,
+                content: JSON.stringify(post),
+                contentDigest: createContentDigest(post),
+            },
+        })
+    )
+    return
+}
