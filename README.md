@@ -2,8 +2,6 @@
 
 Source plugin for pulling Github repository contributors using Github's REST API.
 
-**This plugin has not been published yet to NPM and at this stage it must be placed in your project repository**.
-
 ## Motivation
 
 Github's GraphQL API does not provide an option to fetch top repository contributors ([more details](https://stackoverflow.com/questions/55055471/how-to-query-the-top-contributors-to-a-github-repository-using-graphql)).
@@ -15,7 +13,7 @@ In your `gatsby-config.js`:
 ```js
 plugins: [
     {
-      resolve: require.resolve(`../github-repository-contributors-source-plugin`),
+      resolve: `gatsby-source-github-repository-contributors`,
       options: {
         org: 'spring-cloud',
         repository: 'spring-cloud-aws'
